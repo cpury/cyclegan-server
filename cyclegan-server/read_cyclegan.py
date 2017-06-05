@@ -25,11 +25,11 @@ def imread(path, mode='RGB'):
     return scipy.misc.imread(path, mode=mode) / 127.5 - 1
 
 
-def imwrite(image, path):
+def imwrite(image, path, **kwargs):
     """ save an [-1.0, 1.0] image """
     image = np.array(image)
     image = ((image + 1.) / 2. * 255).astype(np.uint8)
-    return scipy.misc.imsave(path, image)
+    return scipy.misc.imsave(path, image, **kwargs)
 
 
 def im2uint(images):
@@ -177,9 +177,12 @@ class Model:
         output = self.run(direction, image)
         imwrite(output, output_path)
 
-    def run_on_filedescriptor(self, direction, inputfile, outputfile):
-        output = self.run(direction, image)
-        imwrite(output, outputfile)
+    def run_on_filedescriptor(
+        self, direction, inputfile, outputfile, format='JPEG'
+    ):
+        input = imread(inputfile)
+        output = self.run(direction, input)
+        imwrite(output, outputfile, format=format)
 
     def close(self):
         self.session.close()
