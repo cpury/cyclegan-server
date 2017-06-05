@@ -177,6 +177,10 @@ class Model:
         output = self.run(direction, image)
         imwrite(output, output_path)
 
+    def run_on_filedescriptor(self, direction, inputfile, outputfile):
+        output = self.run(direction, image)
+        imwrite(output, outputfile)
+
     def close(self):
         self.session.close()
 

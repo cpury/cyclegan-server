@@ -1,6 +1,8 @@
 import os
-from flask import Flask, request, session, g, redirect, url_for, abort, flash
+from flask import Flask, request, send_file
+from werkzeug.exceptions import NotFound, BadRequest
 from read_cyclegan import Model
+from io import BytesIO
 import atexit
 
 app = Flask(__name__)
@@ -10,6 +12,7 @@ app.config.from_object(__name__)
 app.config.update({
     'CHECKPOINT_DIR': os.path.join(app.root_path, '../model/'),
     'IMAGE_SIZE': 256,
+    'MAX_CONTENT_LENGTH': 8 * 1024 * 1024,  # 8 MB
 ))
 app.config.from_envvar('CGANSERVER_SETTINGS', silent=True)
 
@@ -22,3 +25,29 @@ def shutdown():
 
 
 atexit.register(shutdown)
+
+
+@app.route('/w2m')
+def w2m():
+    input_file = request.files.get('file')
+
+    if not input_file:
+        raise BadRequest
+
+    output_file = BytesIO()
+    output = model.run_on_filedescriptor('a2b', input_file, output_file)
+
+    return send_file(output_file, mimetype='image/jpeg')
+
+
+@app.route('/m2w')
+def m2w():
+    input_file = request.files.get('file')
+
+    if not input_file:
+        raise BadRequest
+
+    output_file = BytesIO()
+    output = model.run_on_filedescriptor('b2a', input_file, output_file)
+
+    return send_file(output_file, mimetype='image/jpeg')
