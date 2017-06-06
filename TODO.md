@@ -1,16 +1,15 @@
 # TODO
 
 ## Next steps:
+- Set up monitoring and logging: http://docs.gunicorn.org/en/stable/deploy.html
+- Set up multiple instances... See how much memory they use.
 
 ## Before deploying:
 - Detect face etc.
 - https://jeffknupp.com/blog/2014/01/29/productionizing-a-flask-application/
-- http://flask.pocoo.org/docs/0.12/deploying/ (don't use beanstalk... just ec2)
-- https://www.matthealy.com.au/blog/post/deploying-flask-to-amazon-web-services-ec2/
-- Find out how to route / dns stuff
+- Find out how to route / dns stuff: http://docs.aws.amazon.com/Route53/latest/DeveloperGuide/routing-to-ec2-instance.html
 
 ## Nice to have:
 - https://developer.mozilla.org/en/docs/Web/HTTP/Access_control_CORS#Access-Control-Allow-Origin
 - Rate limit
-- How to run multiple instances of Flask app?
 - Automatically load latest compressed model from S3

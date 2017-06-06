@@ -27,6 +27,11 @@ def shutdown():
 atexit.register(shutdown)
 
 
+@app.route('/')
+def home():
+    return 'ok'
+
+
 @app.route('/w2m', methods=['PUT', 'POST'])
 def w2m():
     input_file = request.files.get('file') or request.stream
