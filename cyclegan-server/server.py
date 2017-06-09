@@ -1,7 +1,7 @@
 import os
 from flask import Flask, request, send_file
 from werkzeug.exceptions import NotFound, BadRequest
-from read_cyclegan import Model
+from model import Model
 from io import BytesIO
 import atexit
 

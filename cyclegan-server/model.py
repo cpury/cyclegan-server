@@ -5,6 +5,7 @@ import tensorflow as tf
 import functools
 import tensorflow.contrib.slim as slim
 import scipy.misc
+from align import align_face
 
 
 def to_range(images, min_value=0.0, max_value=1.0, dtype=None):
@@ -168,9 +169,22 @@ class Model:
             in_tensor = self.b_real
             model = self.b2a
 
-        real_ipt = imresize(image, [size, size])
+        import time
+
+        t0 = time.clock()
+        aligned_image = align_face(image, size)
+        print('Aligning took', time.clock() - t0, 'seconds')
+
+        t0 = time.clock()
+        real_ipt = imresize(aligned_image, [size, size])
         real_ipt.shape = 1, size, size, 3
-        return self.session.run(model, feed_dict={in_tensor: real_ipt})[0]
+        print('Resizing took', time.clock() - t0, 'seconds')
+
+        t0 = time.clock()
+        result = self.session.run(model, feed_dict={in_tensor: real_ipt})[0]
+        print('Model took', time.clock() - t0, 'seconds')
+
+        return result
 
     def run_on_filepath(self, direction, input_path, output_path):
         image = imread(input_path)
