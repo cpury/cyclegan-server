@@ -12,3 +12,4 @@
 - https://developer.mozilla.org/en/docs/Web/HTTP/Access_control_CORS#Access-Control-Allow-Origin
 - Rate limit
 - Automatically load latest compressed model from S3
+- Can we note how we aligned the face, then undo it and paste it back into the original image?

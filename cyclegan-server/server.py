@@ -1,7 +1,7 @@
 import os
 from flask import Flask, request, send_file
 from werkzeug.exceptions import NotFound, BadRequest
-from model import Model
+from model import Model, NoFaceDetectedException, ImageUnreadableException
 from io import BytesIO
 import atexit
 
@@ -11,7 +11,7 @@ app.config.from_object(__name__)
 # Load default config and override config from an environment variable
 app.config.update({
     'CHECKPOINT_DIR': os.path.join(app.root_path, '../model/'),
-    'IMAGE_SIZE': 256,
+    'IMAGE_SIZE': 128,
     'MAX_CONTENT_LENGTH': 8 * 1024 * 1024,  # 8 MB
 })
 app.config.from_envvar('CGANSERVER_SETTINGS', silent=True)
@@ -37,12 +37,16 @@ def w2m():
     input_file = request.files.get('file') or request.stream
 
     if not input_file:
-        raise BadRequest
+        raise BadRequest(description='No file supplied')
 
     output_file = BytesIO()
-    output = model.run_on_filedescriptor(
-        'a2b', input_file, output_file, format='JPEG'
-    )
+    try:
+        output = model.run_on_filedescriptor(
+            'a2b', input_file, output_file, format='JPEG'
+        )
+    except ImageUnreadableException, NoFaceDetectedException as error:
+        raise BadRequest(description=error.message)
+
     output_file.seek(0)
 
     return send_file(output_file, mimetype='image/jpeg')
@@ -53,12 +57,17 @@ def m2w():
     input_file = request.files.get('file') or request.stream
 
     if not input_file:
-        raise BadRequest
+        raise BadRequest(description='No file supplied')
 
     output_file = BytesIO()
-    output = model.run_on_filedescriptor(
-        'b2a', input_file, output_file, format='JPEG'
-    )
+
+    try:
+        output = model.run_on_filedescriptor(
+            'b2a', input_file, output_file, format='JPEG'
+        )
+    except ImageUnreadableException, NoFaceDetectedException as error:
+        raise BadRequest(description=error.message)
+
     output_file.seek(0)
 
     return send_file(output_file, mimetype='image/jpeg')

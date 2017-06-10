@@ -8,6 +8,14 @@ import scipy.misc
 from align import align_face
 
 
+class ImageUnreadableException(Exception):
+    message = 'The given file could not be read as an image file.'
+
+
+class NoFaceDetectedException(Exception):
+    message = 'No face could be detected in your image.'
+
+
 def to_range(images, min_value=0.0, max_value=1.0, dtype=None):
     """
     transform images from [-1.0, 1.0] to [min_value, max_value] of dtype
@@ -175,6 +183,9 @@ class Model:
         aligned_image = align_face(image, size)
         print('Aligning took', time.clock() - t0, 'seconds')
 
+        if aligned_image is None:
+            raise NoFaceDetectedException()
+
         t0 = time.clock()
         real_ipt = imresize(aligned_image, [size, size])
         real_ipt.shape = 1, size, size, 3
@@ -187,15 +198,23 @@ class Model:
         return result
 
     def run_on_filepath(self, direction, input_path, output_path):
-        image = imread(input_path)
+        try:
+            image = imread(input_path)
+        except OSError:
+            raise ImageUnreadableException()
+
         output = self.run(direction, image)
         imwrite(output, output_path)
 
     def run_on_filedescriptor(
         self, direction, inputfile, outputfile, format='JPEG'
     ):
-        input = imread(inputfile)
-        output = self.run(direction, input)
+        try:
+            image = imread(inputfile)
+        except OSError:
+            raise ImageUnreadableException()
+
+        output = self.run(direction, image)
         imwrite(output, outputfile, format=format)
 
     def close(self):
