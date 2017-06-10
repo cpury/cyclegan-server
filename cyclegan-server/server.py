@@ -44,7 +44,7 @@ def w2m():
         output = model.run_on_filedescriptor(
             'a2b', input_file, output_file, format='JPEG'
         )
-    except ImageUnreadableException, NoFaceDetectedException as error:
+    except (ImageUnreadableException, NoFaceDetectedException) as error:
         raise BadRequest(description=error.message)
 
     output_file.seek(0)
@@ -65,7 +65,7 @@ def m2w():
         output = model.run_on_filedescriptor(
             'b2a', input_file, output_file, format='JPEG'
         )
-    except ImageUnreadableException, NoFaceDetectedException as error:
+    except (ImageUnreadableException, NoFaceDetectedException) as error:
         raise BadRequest(description=error.message)
 
     output_file.seek(0)
