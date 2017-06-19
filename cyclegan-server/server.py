@@ -3,6 +3,7 @@ from flask import Flask, request, send_file
 from werkzeug.exceptions import NotFound, BadRequest
 from model import Model, NoFaceDetectedException, ImageUnreadableException
 from io import BytesIO
+from util import no_cache
 import atexit
 
 app = Flask(__name__)
@@ -33,6 +34,7 @@ def home():
 
 
 @app.route('/w2m', methods=['PUT', 'POST'])
+@no_cache
 def w2m():
     input_file = request.files.get('file') or request.stream
 
@@ -53,6 +55,7 @@ def w2m():
 
 
 @app.route('/m2w', methods=['PUT', 'POST'])
+@no_cache
 def m2w():
     input_file = request.files.get('file') or request.stream
 
